@@ -50,42 +50,192 @@ main{max-width:1000px;margin:0 auto;padding:0 20px}.section{padding:clamp(58px,9
 <section class="section" id="rsvp"><div class="eyebrow">Votre présence est un cadeau</div><h2>Confirmez votre présence</h2><p>Merci de nous faire savoir si vous serez parmi nous pour cette journée de joie.</p><form class="rsvp-box" id="rsvpForm"><label class="field-label" for="guestName">Votre nom et prénom</label><input id="guestName" name="guestName" autocomplete="name" placeholder="Nom et prénom" required><label class="field-label" for="guestReply">Votre réponse</label><select id="guestReply" name="guestReply" required><option value="" selected disabled>Choisissez votre réponse</option><option value="Je serai présent(e) avec joie">Je serai présent(e) avec joie</option><option value="Je ne pourrai malheureusement pas venir">Je ne pourrai malheureusement pas venir</option></select><label class="field-label" for="guestCount">Nombre de personnes (vous compris)</label><select id="guestCount" name="guestCount"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6 ou plus</option></select><button class="btn" type="submit">Envoyer ma réponse sur WhatsApp ↗</button><p class="privacy-note">Votre réponse sera préparée dans WhatsApp. Vous pourrez la vérifier avant de l’envoyer.</p></form></section>
 </main><footer><div class="ornament">✿ ❧ ✿</div><div>Avec amour et reconnaissance envers Dieu</div><div class="closing-names">Samentha & Luckson</div><div class="tiny">19 décembre 2026 · 16 h 30</div><p>Merci de partager notre bonheur.</p></footer>
 <script>
-(()=>{
- const opening=document.getElementById('opening'),key=document.getElementById('key'),lock=document.getElementById('lock'),scene=document.getElementById('lockScene'),fallback=document.getElementById('openFallback');let dragging=false,startX=0,keyStart=0,opened=false;
- function openInvite(){if(opened)return;opened=true;const music=document.getElementById('weddingMusic');music.play().then(()=>{document.getElementById('musicLabel').textContent='Mettre la musique en pause';document.getElementById('musicToggle').setAttribute('aria-pressed','true');}).catch(()=>{document.getElementById('musicLabel').textContent='Appuyez pour écouter la musique';});key.style.transition='left .35s ease,transform .35s ease';key.style.left=(scene.clientWidth-130)+'px';key.style.transform='rotate(-8deg)';lock.animate([{transform:'scale(1)'},{transform:'scale(1.08)'},{transform:'scale(1)'}],{duration:450});setTimeout(()=>{opening.classList.add('dismissed');document.body.style.overflow='';document.getElementById('accueil').scrollIntoView({behavior:'smooth'});},520)}
- document.body.style.overflow='hidden';key.addEventListener('pointerdown',e=>{if(opened)return;dragging=true;startX=e.clientX;keyStart=key.offsetLeft;key.setPointerCapture(e.pointerId);key.style.transition='none';});key.addEventListener('pointermove',e=>{if(!dragging||opened)return;const max=scene.clientWidth-key.offsetWidth;key.style.left=Math.max(0,Math.min(max,keyStart+e.clientX-startX))+'px';});
-function release(){
-  if(!dragging)return;
-  dragging=false;
+(() => {
+  const opening = document.getElementById('opening');
+  const key = document.getElementById('key');
+  const lock = document.getElementById('lock');
+  const scene = document.getElementById('lockScene');
+  const fallback = document.getElementById('openFallback');
+  const audio = document.getElementById('weddingMusic');
+  const musicBtn = document.getElementById('musicToggle');
+  const musicLabel = document.getElementById('musicLabel');
 
-  const kr=key.getBoundingClientRect();
-  const lr=lock.getBoundingClientRect();
+  let dragging = false;
+  let startX = 0;
+  let keyStart = 0;
+  let opened = false;
 
-  if(kr.right>lr.left+10&&kr.left<lr.right+25){
-    const music=document.getElementById('weddingMusic');
+  function updateMusicLabel(playing) {
+    musicLabel.textContent = playing
+      ? 'Mettre la musique en pause'
+      : 'Écouter la musique';
+    musicBtn.setAttribute('aria-pressed', String(playing));
+  }
 
-    // Demander la lecture directement pendant le geste
-    const playPromise=music.play();
+  function openInvite() {
+    if (opened) return;
+    opened = true;
 
-    if(playPromise){
-      playPromise.then(()=>{
-        document.getElementById('musicLabel').textContent='Mettre en pause';
-        document.getElementById('musicToggle').setAttribute('aria-pressed','true');
-      }).catch(()=>{
-        document.getElementById('musicLabel').textContent='Appuyez pour écouter la musique';
-      });
+    key.style.transition = 'left .35s ease, transform .35s ease';
+    key.style.left = Math.max(0, scene.clientWidth - key.offsetWidth) + 'px';
+    key.style.transform = 'rotate(-8deg)';
+
+    if (typeof lock.animate === 'function') {
+      lock.animate(
+        [
+          { transform: 'scale(1)' },
+          { transform: 'scale(1.08)' },
+          { transform: 'scale(1)' }
+        ],
+        { duration: 450 }
+      );
     }
 
-    openInvite();
-  }else{
-    key.style.transition='left .35s ease';
-    key.style.left='3px';
+    // Lancer la musique pendant l'action de l'utilisateur.
+    audio.play().then(() => {
+      updateMusicLabel(true);
+    }).catch(() => {
+      updateMusicLabel(false);
+    });
+
+    setTimeout(() => {
+      opening.classList.add('dismissed');
+      document.body.style.overflow = '';
+      document.getElementById('accueil').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }, 450);
   }
-}
-;const kr=key.getBoundingClientRect(),lr=lock.getBoundingClientRect();if(kr.right>lr.left+10&&kr.left<lr.right+25)openInvite();else{key.style.transition='left .35s ease';key.style.left='3px';}}key.addEventListener('pointerup',release);key.addEventListener('pointercancel',release);key.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openInvite()}});fallback.addEventListener('click',openInvite);
- const audio=document.getElementById('weddingMusic'),musicBtn=document.getElementById('musicToggle'),musicLabel=document.getElementById('musicLabel');musicBtn.addEventListener('click',async()=>{if(audio.paused){try{await audio.play();musicLabel.textContent='Mettre en pause';musicBtn.setAttribute('aria-pressed','true')}catch(e){musicLabel.textContent='Touchez pour écouter'}}else{audio.pause();musicLabel.textContent='Reprendre la musique';musicBtn.setAttribute('aria-pressed','false')}});audio.addEventListener('play',()=>{musicLabel.textContent='Mettre en pause';musicBtn.setAttribute('aria-pressed','true')});audio.addEventListener('pause',()=>{musicLabel.textContent='Reprendre la musique';musicBtn.setAttribute('aria-pressed','false')});
- // Local event time is set to 16:30 in the Dominican Republic (UTC-4 in December).
- const target=new Date('2026-12-19T16:30:00-04:00').getTime();function updateCountdown(){let diff=target-Date.now();if(diff<=0){['days','hours','minutes','seconds'].forEach(id=>document.getElementById(id).textContent='0');document.getElementById('countdownMessage').textContent='Le grand jour est arrivé. Que la fête commence !';return}const d=Math.floor(diff/86400000),h=Math.floor(diff%86400000/3600000),m=Math.floor(diff%3600000/60000),s=Math.floor(diff%60000/1000);document.getElementById('days').textContent=d;document.getElementById('hours').textContent=String(h).padStart(2,'0');document.getElementById('minutes').textContent=String(m).padStart(2,'0');document.getElementById('seconds').textContent=String(s).padStart(2,'0')}updateCountdown();setInterval(updateCountdown,1000);
- document.getElementById('rsvpForm').addEventListener('submit',e=>{e.preventDefault();const name=document.getElementById('guestName').value.trim(),reply=document.getElementById('guestReply').value,count=document.getElementById('guestCount').value;const msg=`Bonjour Samentha et Luckson !%0A%0AJe suis ${encodeURIComponent(name)}.%0A${encodeURIComponent(reply)}.%0ANombre de personnes : ${encodeURIComponent(count)}.%0A%0AFélicitations et merci pour l’invitation !`;window.open('https://wa.me/18292826763?text='+msg,'_blank','noopener')});
+
+  document.body.style.overflow = 'hidden';
+
+  key.addEventListener('pointerdown', (event) => {
+    if (opened) return;
+
+    dragging = true;
+    startX = event.clientX;
+    keyStart = key.offsetLeft;
+    key.style.transition = 'none';
+
+    if (key.setPointerCapture) {
+      key.setPointerCapture(event.pointerId);
+    }
+  });
+
+  key.addEventListener('pointermove', (event) => {
+    if (!dragging || opened) return;
+
+    const maxLeft = Math.max(0, scene.clientWidth - key.offsetWidth);
+    const newLeft = Math.max(
+      0,
+      Math.min(maxLeft, keyStart + event.clientX - startX)
+    );
+
+    key.style.left = newLeft + 'px';
+  });
+
+  function releaseKey() {
+    if (!dragging || opened) return;
+    dragging = false;
+
+    const keyRect = key.getBoundingClientRect();
+    const lockRect = lock.getBoundingClientRect();
+
+    const overlapsLock =
+      keyRect.right > lockRect.left + 10 &&
+      keyRect.left < lockRect.right + 25;
+
+    if (overlapsLock) {
+      openInvite();
+    } else {
+      key.style.transition = 'left .35s ease';
+      key.style.left = '3px';
+      key.style.transform = 'none';
+    }
+  }
+
+  key.addEventListener('pointerup', releaseKey);
+  key.addEventListener('pointercancel', releaseKey);
+
+  key.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openInvite();
+    }
+  });
+
+  // Bouton de secours : permet aussi d'ouvrir l'invitation.
+  fallback.addEventListener('click', openInvite);
+
+  // Commande de la musique.
+  musicBtn.addEventListener('click', async () => {
+    if (audio.paused) {
+      try {
+        await audio.play();
+        updateMusicLabel(true);
+      } catch (error) {
+        musicLabel.textContent = 'Touchez pour écouter la musique';
+      }
+    } else {
+      audio.pause();
+      updateMusicLabel(false);
+    }
+  });
+
+  audio.addEventListener('play', () => updateMusicLabel(true));
+  audio.addEventListener('pause', () => updateMusicLabel(false));
+
+  // Compte à rebours : heure locale de République dominicaine.
+  const target = new Date('2026-12-19T16:30:00-04:00').getTime();
+
+  function updateCountdown() {
+    const diff = target - Date.now();
+
+    if (diff <= 0) {
+      ['days', 'hours', 'minutes', 'seconds'].forEach((id) => {
+        document.getElementById(id).textContent = '0';
+      });
+
+      document.getElementById('countdownMessage').textContent =
+        'Le grand jour est arrivé. Que la fête commence !';
+      return;
+    }
+
+    document.getElementById('days').textContent =
+      Math.floor(diff / 86400000);
+
+    document.getElementById('hours').textContent =
+      String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
+
+    document.getElementById('minutes').textContent =
+      String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+
+    document.getElementById('seconds').textContent =
+      String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Confirmation de présence par WhatsApp.
+  document.getElementById('rsvpForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const name = document.getElementById('guestName').value.trim();
+    const reply = document.getElementById('guestReply').value;
+    const count = document.getElementById('guestCount').value;
+
+    const message =
+      `Bonjour Samentha et Luckson !\n\n` +
+      `Je suis ${name}.\n${reply}.\n` +
+      `Nombre de personnes : ${count}.\n\n` +
+      `Félicitations et merci pour l’invitation !`;
+
+    const url =
+      'https://wa.me/18292826763?text=' +
+      encodeURIComponent(message);
+
+    window.open(url, '_blank');
+  });
 })();
 </script></body></html>
