@@ -1,0 +1,11 @@
+INVITATION DE MARIAGE — SAMENTHA ELME & LUCKSON ATHELUS
+
+Fichiers : index.html et assets/ (photo + musique).
+
+APERÇU LOCAL : ouvrez index.html dans un navigateur.
+PUBLICATION GITHUB PAGES : téléversez index.html et le dossier assets/ à la racine du dépôt, puis activez Settings > Pages > Deploy from a branch > main > /(root).
+
+Date : samedi 19 décembre 2026, 16 h 30 (heure de République dominicaine).
+WhatsApp RSVP : 829 282 6763.
+
+La musique ne démarre qu’après un clic/toucher, selon les règles des navigateurs. Les réponses RSVP s’ouvrent dans WhatsApp et doivent être envoyées par l’invité.
